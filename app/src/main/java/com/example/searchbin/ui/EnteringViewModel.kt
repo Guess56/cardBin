@@ -11,7 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class EnteringViewModel(val searchInteractor: SearchInteractor): ViewModel() {
+class EnteringViewModel(val searchInteractor: SearchInteractor) : ViewModel() {
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
@@ -27,28 +27,32 @@ class EnteringViewModel(val searchInteractor: SearchInteractor): ViewModel() {
         viewModelScope.launch {
             searchInteractor
                 .search(bin)
-                .collect{ pair ->
-                    processResult(pair.first,pair.second!!.toInt())
+                .collect { pair ->
+                    processResult(pair.first, pair.second!!.toInt())
                 }
         }
     }
-    private fun processResult(text:List<CardInfo>?, error : Int?){
+
+    private fun processResult(text: List<CardInfo>?, error: Int?) {
         val cards = mutableListOf<CardInfo>()
         if (text != null) {
             cards.addAll(text)
         }
-        when{
+        when {
             error != null -> {
                 state.postValue(ScreenState.Error(error.toString()))
             }
+
             else -> {
                 state.postValue(ScreenState.Content(cards))
             }
         }
     }
+
     fun clearJob() {
         searchJob?.cancel()
     }
+
     fun searchDebounce(expression: String) {
         if (textInput == expression) {
             return
@@ -62,5 +66,4 @@ class EnteringViewModel(val searchInteractor: SearchInteractor): ViewModel() {
             }
         }
     }
-
 }

@@ -20,6 +20,7 @@ class EnteringFragment: Fragment() {
         get() = _binding!!
 
     private val viewModel by viewModel<EnteringViewModel>()
+    private val enteringAdapter = EnteringAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,7 +34,7 @@ class EnteringFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupTextWatcher()
         setupObservers()
-
+        enteringAdapter.notifyDataSetChanged()
     }
 
     private fun setupTextWatcher() {

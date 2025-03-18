@@ -115,5 +115,62 @@
         android:inputType="number"
         android:background="@android:color/transparent"
         />
+    <TextView
+        android:id="@+id/urlTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/creditCard"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:text="Url Банка"/>
+    <TextView
+        android:id="@+id/url"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/urlTitle"
+        app:layout_constraintTop_toTopOf="@id/urlTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Url Банка"/>
+    <TextView
+        android:id="@+id/phoneTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/urlTitle"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:text="Телефон Банка"/>
+    <TextView
+        android:id="@+id/phone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/phoneTitle"
+        app:layout_constraintTop_toTopOf="@id/phoneTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Телефон Банка"/>
+    <TextView
+        android:id="@+id/coordTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/phoneTitle"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:text="Координаты Банка"/>
+    <TextView
+        android:id="@+id/coord"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/coordTitle"
+        app:layout_constraintTop_toTopOf="@id/coordTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Координаты Банка"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

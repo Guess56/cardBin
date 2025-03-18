@@ -14,29 +14,40 @@ import com.example.searchbin.utils.Resource
 
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
 class SearchRepositoryImpl(
     private val networkClient: NetworkClient,
+
 ) : SearchRepository {
     override suspend fun getCardInfo(expression: String): Flow<Resource<List<CardInfo>>> = flow {
+        // Проверяем корректность входных данных
+        if (expression.isEmpty() || expression.any { !it.isDigit() }) {
+            emit(Resource.Error("Некорректный формат параметра bin"))
+            return@flow
+        }
+
+        // Выполняем запрос
         val response = networkClient.doRequest(CardInfoRequest(expression))
 
-        when (response.resultCode) {
-            200 -> {
-                with(response as CardInfoResponse) {
-                    val card = results.map { cardDto ->
-                        cardDto.toCardInfo() // Используйте функцию toCardInfo для преобразования
-                    }
-                    emit(Resource.Success(card))
+        if (response.isSuccessful) {
+            val cardInfoResponse = response.body()
+            if (cardInfoResponse != null) {
+                val card = cardInfoResponse.results.map { cardDto ->
+                    cardDto.toCardInfo()
                 }
+                emit(Resource.Success(card))
+            } else {
+                emit(Resource.Error("Пустое тело ответа"))
             }
-            else -> {
-                emit(Resource.Error("Ошибка ${response.resultCode}"))
-            }
+        } else {
+            emit(Resource.Error("Ошибка ${response.code()}"))
         }
+    }.catch { e ->
+        emit(Resource.Error("Сетевая ошибка: ${e.message.toString()}"))
     }
-}
+    }
 
 // Функция преобразования CardInfoDto в CardInfo
 fun CardInfoDto.toCardInfo(): CardInfo {
