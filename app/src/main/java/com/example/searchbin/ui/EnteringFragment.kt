@@ -66,6 +66,7 @@ class EnteringFragment: Fragment() {
 
                 is ScreenState.Content -> {
                     if (state.data.isNotEmpty()) {
+                        enteringAdapter.updateItems(state.data) // Обновляем адаптер
                         enteringAdapter.notifyDataSetChanged()
                     } else {
                         Log.d("Card", "Пустой список данных")

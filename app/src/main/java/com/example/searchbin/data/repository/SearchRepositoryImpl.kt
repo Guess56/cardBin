@@ -21,31 +21,34 @@ import kotlinx.coroutines.flow.flow
 class SearchRepositoryImpl(
     private val networkClient: NetworkClient,
 ) : SearchRepository {
+
     override suspend fun getCardInfo(expression: String): Flow<Resource<List<CardInfo>>> = flow {
         try {
             // Проверяем корректность входных данных
             if (expression.isEmpty() || expression.any { !it.isDigit() }) {
-                emit(Resource.Error("Некорректный формат параметра bin"))
+                emit(Resource.Error("Некорректный формат параметра BIN"))
                 return@flow
             }
 
-            // Выполняем запрос
+            // Выполняем запрос через NetworkClient
             val response = networkClient.doRequest(CardInfoRequest(expression))
 
             if (response.isSuccessful) {
+                // Получаем тело ответа
                 val cardInfoResponse = response.body()
-                if (cardInfoResponse != null && !cardInfoResponse.results.isNullOrEmpty()) {
-                    val card = cardInfoResponse.results.mapNotNull { cardDto ->
-                        cardDto.toCardInfo()
-                    }
+                if (cardInfoResponse != null) {
+                    // Преобразуем ответ в модель CardInfo
+                    val card = listOfNotNull(cardInfoResponse.toCardInfo())
                     emit(Resource.Success(card))
                 } else {
-                    emit(Resource.Error("Пустое тело ответа или отсутствуют результаты"))
+                    emit(Resource.Error("Пустое тело ответа"))
                 }
             } else {
-                emit(Resource.Error("Ошибка ${response.code()}"))
+                emit(Resource.Error("Ошибка: ${response.code()} - ${response.message()}"))
             }
         } catch (e: Exception) {
+            // Ловим исключения и возвращаем ошибку
+            Log.e("SearchRepository", "Ошибка при выполнении запроса: ${e.message}", e)
             emit(Resource.Error("Сетевая ошибка: ${e.message}"))
         }
     }
@@ -79,6 +82,17 @@ fun CountryInfoDto.toCountryInfo(): CountryInfo {
         currency = this.currency ?: "",
         latitude = this.latitude ?: 0,
         longitude = this.longitude ?: 0
+    )
+}
+fun CardInfoResponse.toCardInfo(): CardInfo {
+    return CardInfo(
+        number = this.number?.length?.toString() ?: "",
+        scheme = this.scheme ?: "",
+        type = this.type ?: "",
+        brand = this.brand ?: "",
+        prepaid = false, // This field is not present in the API response
+        country = this.country?.toCountryInfo() ?: CountryInfo("", "", "", "", "", 0, 0),
+        bank = this.bank?.toBankInfo() ?: BankInfo("", "", "", "")
     )
 }
 

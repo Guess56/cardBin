@@ -95,5 +95,6 @@ dependencies {
 
     // Permissions handling with Peko
     implementation("com.markodevcic:peko:3.0.5")
+    implementation ("com.squareup.okhttp3:logging-interceptor:3.9.0")
 
 }
