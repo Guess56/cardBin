@@ -29,23 +29,25 @@ class EnteringViewHolder(
                 }
             }
         }
+
         binding.phone.setOnClickListener {
-            if (binding.url.text.equals("Номер не указан")) {
+            if (binding.phone.text.equals("Номер не указан")) {
                 Toast.makeText(context, "Api передал пустой номер", Toast.LENGTH_SHORT).show()
             } else {
                 val phoneText = binding.phone.text.toString()
                 val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneText"))
-                binding.root.context.startActivity(intent)
+                context.startActivity(intent)
             }
         }
+
         binding.coord.setOnClickListener {
-            if (binding.url.text.equals("Город не указан")) {
+            if (binding.coord.text.equals("Город не указан")) {
                 Toast.makeText(context, "Api передал пустой город", Toast.LENGTH_SHORT).show()
             } else {
                 val cityText = binding.coord.text.toString()
                 val uri = Uri.parse("geo:0,0?q=$cityText")
                 val intent = Intent(Intent.ACTION_VIEW, uri)
-                binding.root.context.startActivity(intent)
+                context.startActivity(intent)
             }
         }
 

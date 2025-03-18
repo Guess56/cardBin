@@ -133,6 +133,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:clickable="true"
         android:hint="Url Банка"/>
     <TextView
         android:id="@+id/phoneTitle"
@@ -152,6 +153,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:clickable="true"
         android:hint="Телефон Банка"/>
     <TextView
         android:id="@+id/coordTitle"
@@ -171,6 +173,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:clickable="true"
         android:hint="Координаты Банка"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
