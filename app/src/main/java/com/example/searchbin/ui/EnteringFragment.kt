@@ -30,11 +30,11 @@ class EnteringFragment: Fragment() {
         _binding = EnteringBinFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupTextWatcher()
         setupObservers()
-        enteringAdapter.notifyDataSetChanged()
     }
 
     private fun setupTextWatcher() {
@@ -44,8 +44,8 @@ class EnteringFragment: Fragment() {
             }
 
             override fun onTextChanged(p0: CharSequence?, start: Int, before: Int, count: Int) {
-                if (p0 != null && p0.length >= 6){
-                viewModel.searchDebounce(p0.toString())
+                if (p0 != null && p0.length >= 6) {
+                    viewModel.searchDebounce(p0.toString())
                 }
             }
 
@@ -54,14 +54,22 @@ class EnteringFragment: Fragment() {
         }
         binding.bin.addTextChangedListener(simpleTextWatcher)
     }
+
     private fun setupObservers() {
         viewModel.getState().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is ScreenState.Loading -> {}
                 is ScreenState.Empty -> {}
-                is ScreenState.Error -> {}
+                is ScreenState.Error -> {
+                    Log.e("Card", "Ошибка: ${state.message}")
+                }
+
                 is ScreenState.Content -> {
-                    Log.d("Card","${state.data}")
+                    if (state.data.isNotEmpty()) {
+                        enteringAdapter.notifyDataSetChanged()
+                    } else {
+                        Log.d("Card", "Пустой список данных")
+                    }
                 }
             }
         }

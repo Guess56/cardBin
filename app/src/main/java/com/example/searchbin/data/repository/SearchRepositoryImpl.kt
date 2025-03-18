@@ -1,5 +1,6 @@
 package com.example.searchbin.data.repository
 
+import android.util.Log
 import com.example.searchbin.data.dto.BankInfoDto
 import com.example.searchbin.data.dto.CardInfoDto
 import com.example.searchbin.data.dto.CardInfoRequest
@@ -19,47 +20,53 @@ import kotlinx.coroutines.flow.flow
 
 class SearchRepositoryImpl(
     private val networkClient: NetworkClient,
-
 ) : SearchRepository {
     override suspend fun getCardInfo(expression: String): Flow<Resource<List<CardInfo>>> = flow {
-        // Проверяем корректность входных данных
-        if (expression.isEmpty() || expression.any { !it.isDigit() }) {
-            emit(Resource.Error("Некорректный формат параметра bin"))
-            return@flow
-        }
-
-        // Выполняем запрос
-        val response = networkClient.doRequest(CardInfoRequest(expression))
-
-        if (response.isSuccessful) {
-            val cardInfoResponse = response.body()
-            if (cardInfoResponse != null) {
-                val card = cardInfoResponse.results.map { cardDto ->
-                    cardDto.toCardInfo()
-                }
-                emit(Resource.Success(card))
-            } else {
-                emit(Resource.Error("Пустое тело ответа"))
+        try {
+            // Проверяем корректность входных данных
+            if (expression.isEmpty() || expression.any { !it.isDigit() }) {
+                emit(Resource.Error("Некорректный формат параметра bin"))
+                return@flow
             }
-        } else {
-            emit(Resource.Error("Ошибка ${response.code()}"))
+
+            // Выполняем запрос
+            val response = networkClient.doRequest(CardInfoRequest(expression))
+
+            if (response.isSuccessful) {
+                val cardInfoResponse = response.body()
+                if (cardInfoResponse != null && !cardInfoResponse.results.isNullOrEmpty()) {
+                    val card = cardInfoResponse.results.mapNotNull { cardDto ->
+                        cardDto.toCardInfo()
+                    }
+                    emit(Resource.Success(card))
+                } else {
+                    emit(Resource.Error("Пустое тело ответа или отсутствуют результаты"))
+                }
+            } else {
+                emit(Resource.Error("Ошибка ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error("Сетевая ошибка: ${e.message}"))
         }
-    }.catch { e ->
-        emit(Resource.Error("Сетевая ошибка: ${e.message.toString()}"))
     }
-    }
+}
+
 
 // Функция преобразования CardInfoDto в CardInfo
-fun CardInfoDto.toCardInfo(): CardInfo {
-    return CardInfo(
-        number = this.number.length.toString() ?: "", // Используйте number напрямую, а не length
-        scheme = this.scheme ?: "",
-        type = this.type ?: "",
-        brand = this.brand ?: "",
-        prepaid = this.prepaid ?: false,
-        country = this.country?.toCountryInfo() ?: CountryInfo("", "", "", "", "", 0, 0),
-        bank = this.bank?.toBankInfo() ?: BankInfo("", "", "", "")
-    )
+fun CardInfoDto.toCardInfo(): CardInfo? {
+    return if (this.number != null && this.scheme != null) {
+        CardInfo(
+            number = this.number.length.toString(),
+            scheme = this.scheme,
+            type = this.type ?: "",
+            brand = this.brand ?: "",
+            prepaid = this.prepaid ?: false,
+            country = this.country?.toCountryInfo() ?: CountryInfo("", "", "", "", "", 0, 0),
+            bank = this.bank?.toBankInfo() ?: BankInfo("", "", "", "")
+        )
+    } else {
+        null
+    }
 }
 
 // Функции преобразования CountryInfoDto и BankInfoDto
