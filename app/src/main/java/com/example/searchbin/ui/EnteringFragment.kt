@@ -59,15 +59,17 @@ class EnteringFragment: Fragment() {
         viewModel.getState().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is ScreenState.Loading -> {}
-                is ScreenState.Empty -> {}
+                is ScreenState.Empty -> {
+                    Log.d("Card", "Пустой список данных")
+                }
                 is ScreenState.Error -> {
                     Log.e("Card", "Ошибка: ${state.message}")
                 }
 
                 is ScreenState.Content -> {
                     if (state.data.isNotEmpty()) {
+                        Log.e("Card", "успех: ${state.data}")
                         enteringAdapter.updateItems(state.data) // Обновляем адаптер
-                        enteringAdapter.notifyDataSetChanged()
                     } else {
                         Log.d("Card", "Пустой список данных")
                     }

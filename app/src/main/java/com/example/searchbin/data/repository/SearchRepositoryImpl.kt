@@ -12,10 +12,7 @@ import com.example.searchbin.domain.model.CardInfo
 import com.example.searchbin.domain.model.CountryInfo
 import com.example.searchbin.domain.repository.SearchRepository
 import com.example.searchbin.utils.Resource
-
-
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
 class SearchRepositoryImpl(
@@ -36,6 +33,7 @@ class SearchRepositoryImpl(
             if (response.isSuccessful) {
                 // Получаем тело ответа
                 val cardInfoResponse = response.body()
+                Log.d("123", "$cardInfoResponse")
                 if (cardInfoResponse != null) {
                     // Преобразуем ответ в модель CardInfo
                     val card = listOfNotNull(cardInfoResponse.toCardInfo())
@@ -84,23 +82,29 @@ fun CountryInfoDto.toCountryInfo(): CountryInfo {
         longitude = this.longitude ?: 0
     )
 }
+
 fun CardInfoResponse.toCardInfo(): CardInfo {
     return CardInfo(
         number = this.number?.length?.toString() ?: "",
         scheme = this.scheme ?: "",
         type = this.type ?: "",
         brand = this.brand ?: "",
-        prepaid = false, // This field is not present in the API response
+        prepaid = false,
         country = this.country?.toCountryInfo() ?: CountryInfo("", "", "", "", "", 0, 0),
-        bank = this.bank?.toBankInfo() ?: BankInfo("", "", "", "")
+        bank = this.bank?.toBankInfo() ?: BankInfo(
+            "",
+            "url не указан",
+            "Номер не указан",
+            "Город не указан"
+        )
     )
 }
 
 fun BankInfoDto.toBankInfo(): BankInfo {
     return BankInfo(
         name = this.name ?: "",
-        url = this.url ?: "",
-        phone = this.phone ?: "",
-        city = this.city ?: ""
+        url = this.url ?: "url не указан",
+        phone = this.phone ?: "Номер не указан",
+        city = this.city ?: "Город не указан"
     )
 }
