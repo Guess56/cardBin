@@ -1,11 +1,15 @@
 package com.example.searchbin.di
 
 
+import androidx.room.Room
+import androidx.room.Room.databaseBuilder
+import com.example.searchbin.AppDataBase
 import com.example.searchbin.data.network.NetworkClient
 import com.example.searchbin.data.network.RetrofitClient
 import com.example.searchbin.data.network.WebApiClient
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -39,5 +43,9 @@ val dataModule = module {
     // Создаем NetworkClient, который использует WebApiClient
     single<NetworkClient> {
         RetrofitClient(get())
+    }
+    single {
+        databaseBuilder(androidContext(), AppDataBase::class.java,"database.db")
+            .build()
     }
 }

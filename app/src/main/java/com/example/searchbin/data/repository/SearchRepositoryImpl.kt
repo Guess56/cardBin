@@ -14,6 +14,7 @@ import com.example.searchbin.domain.repository.SearchRepository
 import com.example.searchbin.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.util.UUID
 
 class SearchRepositoryImpl(
     private val networkClient: NetworkClient,
@@ -57,13 +58,21 @@ class SearchRepositoryImpl(
 fun CardInfoDto.toCardInfo(): CardInfo? {
     return if (this.number != null && this.scheme != null) {
         CardInfo(
+            id = UUID.randomUUID().toString(),
             number = this.number.length.toString(),
             scheme = this.scheme,
             type = this.type ?: "",
             brand = this.brand ?: "",
             prepaid = this.prepaid ?: false,
             country = this.country?.toCountryInfo() ?: CountryInfo("", "", "", "", "", 0, 0),
-            bank = this.bank?.toBankInfo() ?: BankInfo("", "", "", "")
+            bank = this.bank?.toBankInfo() ?: BankInfo(
+                id = UUID.randomUUID().toString(),
+                bin = "",
+                name = "",
+                url = "url не указан",
+                phone = "Номер не указан",
+                city = "Город не указан"
+            )
         )
     } else {
         null
@@ -85,23 +94,28 @@ fun CountryInfoDto.toCountryInfo(): CountryInfo {
 
 fun CardInfoResponse.toCardInfo(): CardInfo {
     return CardInfo(
-        number = this.number?.length?.toString() ?: "",
+        id = UUID.randomUUID().toString(),
+        number = this.number.toString() ?: "",
         scheme = this.scheme ?: "",
         type = this.type ?: "",
         brand = this.brand ?: "",
         prepaid = false,
         country = this.country?.toCountryInfo() ?: CountryInfo("", "", "", "", "", 0, 0),
         bank = this.bank?.toBankInfo() ?: BankInfo(
-            "",
-            "url не указан",
-            "Номер не указан",
-            "Город не указан"
+            id = UUID.randomUUID().toString(),
+            bin = "",
+            name = "",
+            url = "url не указан",
+            phone = "Номер не указан",
+            city = "Город не указан"
         )
     )
 }
 
 fun BankInfoDto.toBankInfo(): BankInfo {
     return BankInfo(
+        id = UUID.randomUUID().toString(),
+        bin = "",
         name = this.name ?: "",
         url = this.url ?: "url не указан",
         phone = this.phone ?: "Номер не указан",

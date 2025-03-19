@@ -4,16 +4,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.searchbin.databinding.EnteringBinFragmentBinding
-import com.example.searchbin.domain.model.CardInfo
+import com.example.searchbin.R
+import com.example.searchbin.domain.model.BankInfo
 
-class EnteringAdapter : RecyclerView.Adapter<EnteringViewHolder>() {
+class EnteringAdapter() : RecyclerView.Adapter<EnteringViewHolder>() {
 
     var onItemClickListener: EnteringViewHolder.OnItemClickListener? = null
 
-    private var items: List<CardInfo> = emptyList()
+    private var items: List<BankInfo> = emptyList()
 
-    fun updateItems(newItems: List<CardInfo>) {
+    fun updateItems(newItems: List<BankInfo>) {
         val oldItems = items
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int {
@@ -25,7 +25,7 @@ class EnteringAdapter : RecyclerView.Adapter<EnteringViewHolder>() {
             }
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return oldItems[oldItemPosition].bank.name == newItems[newItemPosition].bank.name
+                return oldItems[oldItemPosition].bin == newItems[newItemPosition].bin
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -37,8 +37,8 @@ class EnteringAdapter : RecyclerView.Adapter<EnteringViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EnteringViewHolder {
-        val binding = EnteringBinFragmentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return EnteringViewHolder(binding,parent.context)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.card_item, parent, false)
+        return EnteringViewHolder(view)
     }
 
     override fun getItemCount(): Int {

@@ -5,22 +5,30 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.searchbin.data.SearchInteractor
+import com.example.searchbin.domain.db.DbInteractor
+import com.example.searchbin.domain.model.BankInfo
 import com.example.searchbin.domain.model.CardInfo
+import com.example.searchbin.utils.HistoryScreenState
 import com.example.searchbin.utils.Resource
 import com.example.searchbin.utils.ScreenState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class EnteringViewModel(val searchInteractor: SearchInteractor) : ViewModel() {
+class EnteringViewModel(
+    val searchInteractor: SearchInteractor,
+    val dbInteractor: DbInteractor
+) : ViewModel() {
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 
     private val state = MutableLiveData<ScreenState>()
+    private val historyState = MutableLiveData<HistoryScreenState>()
     private var textInput = ""
     private var searchJob: Job? = null
     fun getState(): LiveData<ScreenState> = state
+    fun getHistoryState(): LiveData<HistoryScreenState> = historyState
 
 
     private fun loadData(bin: String) {
@@ -64,5 +72,35 @@ class EnteringViewModel(val searchInteractor: SearchInteractor) : ViewModel() {
                 loadData(expression)
             }
         }
+    }
+    fun loadHistory(){
+        viewModelScope.launch {
+            dbInteractor.getCard().collect { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        resultHistory(resource.data ?: emptyList())
+                    }
+                    is Resource.Error -> {
+                        renderState(HistoryScreenState.Empty(resource.message.toString()))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun resultHistory(card: List<BankInfo>){
+        if (card.isEmpty()){
+            renderState(HistoryScreenState.Empty("Список пуст"))
+        } else {
+            renderState(HistoryScreenState.Content(card))
+        }
+    }
+
+    private fun renderState(state: HistoryScreenState) {
+        historyState.postValue(state)
+    }
+
+    suspend fun addCardDb(bin:String, bankInfo: BankInfo){
+        dbInteractor.insertCard(bankInfo,bin)
     }
 }
